@@ -1,0 +1,48 @@
+{
+  "entities": {
+    "Product": {
+      "title": "Product",
+      "description": "A merchandise product available for sale",
+      "type": "object",
+      "properties": {
+        "name": { "type": "string", "description": "The name of the product" },
+        "description": { "type": "string", "description": "Detailed product description" },
+        "price": { "type": "number", "description": "Price in INR" },
+        "image": { "type": "string", "description": "URL to the product image" },
+        "category": { "type": "string", "description": "Product category (e.g., Clothing, Accessories)" },
+        "stock": { "type": "number", "description": "Current inventory count" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["name", "price", "image", "category", "stock"]
+    },
+    "Order": {
+      "title": "Order",
+      "description": "A customer order for products",
+      "type": "object",
+      "properties": {
+        "customerEmail": { "type": "string", "format": "email" },
+        "customerName": { "type": "string" },
+        "items": { 
+          "type": "array",
+          "description": "List of items in the order"
+        },
+        "totalAmount": { "type": "number" },
+        "status": { "type": "string", "enum": ["pending", "paid", "shipped", "cancelled"] },
+        "razorpayOrderId": { "type": "string" },
+        "razorpayPaymentId": { "type": "string" },
+        "createdAt": { "type": "string", "format": "date-time" }
+      },
+      "required": ["customerEmail", "customerName", "items", "totalAmount", "status", "createdAt"]
+    }
+  },
+  "firestore": {
+    "products": {
+      "schema": { "$ref": "Product" },
+      "description": "Collection of merchandise products"
+    },
+    "orders": {
+      "schema": { "$ref": "Order" },
+      "description": "Collection of customer orders"
+    }
+  }
+}
