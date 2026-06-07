@@ -1,31 +1,27 @@
 <?php
 
-use App\Http\Middleware\CheckRole;
-use App\Http\Middleware\VerifySupabaseJwt;
+use App\Http\Middleware\EnsureUserHasRole;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
 
 return Application::configure(basePath: dirname(__DIR__))
     ->withRouting(
-        web: __DIR__.'/../routes/web.php',
-        then: function () {
-            Route::middleware('api')
-                ->prefix('api/v1')
-                ->group(base_path('routes/api.php'));
-
-            Route::middleware('api')
-                ->prefix('api/v1/webhooks')
-                ->group(base_path('routes/webhooks.php'));
-        },
+        api: __DIR__ . '/../routes/api.php',
+        commands: __DIR__ . '/../routes/console.php',
+        health: '/up',
+        apiPrefix: 'api',
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'auth.supabase' => VerifySupabaseJwt::class,
-            'role'          => CheckRole::class,
+            'role' => EnsureUserHasRole::class,
+        ]);
+
+        // Exclude webhook routes from CSRF / Sanctum cookie verification
+        $middleware->validateCsrfTokens(except: [
+            'api/webhooks/*',
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
         //
-    })
-    ->create();
+    })->create();
