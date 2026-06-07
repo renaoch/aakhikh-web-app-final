@@ -3,47 +3,44 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Testimonial;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
-    /**
-     * Display a listing of the resource.
-     */
-    public function index()
+    public function index(Request $request): JsonResponse
     {
-        //
+        $testimonials = Testimonial::query()
+            ->when($request->approved, fn($q) => $q->where('is_approved', true))
+            ->when($request->search, fn($q, $s) => $q->where('name', 'like', "%{$s}%"))
+            ->orderBy('created_at', 'desc')
+            ->paginate($request->per_page ?? 15);
+
+        return response()->json(['success' => true, 'data' => $testimonials]);
     }
 
-    /**
-     * Store a newly created resource in storage.
-     */
-    public function store(Request $request)
+    public function update(Request $request, string $id): JsonResponse
     {
-        //
+        $testimonial = Testimonial::findOrFail($id);
+
+        $validated = $request->validate([
+            'is_approved' => 'required|boolean',
+            'name'        => 'sometimes|string|max:100',
+            'content'     => 'sometimes|string',
+            'is_featured' => 'boolean',
+        ]);
+
+        $testimonial->update($validated);
+
+        return response()->json(['success' => true, 'data' => $testimonial]);
     }
 
-    /**
-     * Display the specified resource.
-     */
-    public function show(string $id)
+    public function destroy(string $id): JsonResponse
     {
-        //
-    }
+        $testimonial = Testimonial::findOrFail($id);
+        $testimonial->delete();
 
-    /**
-     * Update the specified resource in storage.
-     */
-    public function update(Request $request, string $id)
-    {
-        //
-    }
-
-    /**
-     * Remove the specified resource from storage.
-     */
-    public function destroy(string $id)
-    {
-        //
+        return response()->json(['success' => true, 'message' => 'Testimonial deleted.']);
     }
 }
