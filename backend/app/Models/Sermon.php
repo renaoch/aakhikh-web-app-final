@@ -2,23 +2,41 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Sermon extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'youtube_video_id', 'title', 'speaker', 'topic',
-        'description', 'thumbnail_url', 'published_at',
-        'is_featured', 'view_count',
+        'title', 'description', 'speaker', 'series',
+        'preached_at', 'youtube_url', 'thumbnail',
+        'audio_url', 'is_published',
     ];
 
-    protected $casts = [
-        'published_at' => 'datetime',
-        'is_featured'  => 'boolean',
-        'view_count'   => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'preached_at'  => 'date',
+            'is_published' => 'boolean',
+        ];
+    }
+
+    /* ── Scopes ─────────────────────────────────────────────── */
+    public function scopePublished(Builder $q): Builder
+    {
+        return $q->where('is_published', true);
+    }
+
+    public function scopeLatest(Builder $q): Builder
+    {
+        return $q->orderByDesc('preached_at');
+    }
+
+    public function scopeBySeries(Builder $q, string $series): Builder
+    {
+        return $q->where('series', $series);
+    }
 }

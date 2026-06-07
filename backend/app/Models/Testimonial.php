@@ -2,21 +2,33 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Testimonial extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'author_name', 'content', 'status', 'submitted_at', 'reviewed_by',
+        'name', 'content', 'avatar', 'is_approved', 'is_featured',
     ];
 
-    protected $casts = [
-        'submitted_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'is_approved' => 'boolean',
+            'is_featured' => 'boolean',
+        ];
+    }
 
-    public function reviewer() { return $this->belongsTo(User::class, 'reviewed_by'); }
+    public function scopeApproved(Builder $q): Builder
+    {
+        return $q->where('is_approved', true);
+    }
+
+    public function scopeFeatured(Builder $q): Builder
+    {
+        return $q->where('is_featured', true)->approved();
+    }
 }

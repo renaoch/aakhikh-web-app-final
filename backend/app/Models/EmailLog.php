@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
@@ -10,14 +11,21 @@ class EmailLog extends Model
     use HasFactory;
 
     protected $fillable = [
-        'type', 'subject', 'recipient_count',
-        'sent_at', 'ses_message_id', 'open_count', 'bounce_count',
+        'to', 'subject', 'type', 'status', 'error', 'sent_at',
     ];
 
-    protected $casts = [
-        'sent_at'        => 'datetime',
-        'recipient_count' => 'integer',
-        'open_count'     => 'integer',
-        'bounce_count'   => 'integer',
-    ];
+    protected function casts(): array
+    {
+        return ['sent_at' => 'datetime'];
+    }
+
+    public function scopeFailed(Builder $q): Builder
+    {
+        return $q->where('status', 'failed');
+    }
+
+    public function scopeByType(Builder $q, string $type): Builder
+    {
+        return $q->where('type', $type);
+    }
 }

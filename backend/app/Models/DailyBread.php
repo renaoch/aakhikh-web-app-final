@@ -2,23 +2,34 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DailyBread extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'title', 'body', 'bible_reference', 'image_url',
-        'published_date', 'scheduled_sent_at', 'created_by',
+        'title', 'verse', 'verse_reference',
+        'content', 'author', 'published_at', 'is_published',
     ];
 
-    protected $casts = [
-        'published_date'   => 'date',
-        'scheduled_sent_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'published_at'  => 'date',
+            'is_published'  => 'boolean',
+        ];
+    }
 
-    public function author() { return $this->belongsTo(User::class, 'created_by'); }
+    public function scopePublished(Builder $q): Builder
+    {
+        return $q->where('is_published', true);
+    }
+
+    public function scopeForDate(Builder $q, string $date): Builder
+    {
+        return $q->whereDate('published_at', $date);
+    }
 }

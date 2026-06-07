@@ -2,20 +2,36 @@
 
 namespace App\Models;
 
+use App\Enums\DonationStatus;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Donation extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'donor_name', 'donor_email', 'amount', 'type',
-        'category', 'razorpay_payment_id', 'razorpay_order_id', 'status',
+        'name', 'email', 'phone', 'amount', 'purpose',
+        'message', 'status', 'razorpay_order_id',
+        'payment_id', 'payment_signature',
     ];
 
-    protected $casts = [
-        'amount' => 'decimal:2',
-    ];
+    protected function casts(): array
+    {
+        return [
+            'amount' => 'decimal:2',
+            'status' => DonationStatus::class,
+        ];
+    }
+
+    public function scopePaid(Builder $q): Builder
+    {
+        return $q->where('status', DonationStatus::Paid);
+    }
+
+    public function scopeByPurpose(Builder $q, string $purpose): Builder
+    {
+        return $q->where('purpose', $purpose);
+    }
 }

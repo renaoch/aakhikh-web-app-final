@@ -9,14 +9,25 @@ class RoleAuditLog extends Model
 {
     use HasFactory;
 
+    public $timestamps = false;
+
     protected $fillable = [
         'user_id', 'changed_by', 'old_role', 'new_role', 'changed_at',
     ];
 
-    protected $casts = [
-        'changed_at' => 'datetime',
-    ];
+    protected function casts(): array
+    {
+        return ['changed_at' => 'datetime'];
+    }
 
-    public function user() { return $this->belongsTo(User::class); }
-    public function changedBy() { return $this->belongsTo(User::class, 'changed_by'); }
+    /* ── Relationships ─────────────────────────────────────── */
+    public function user()
+    {
+        return $this->belongsTo(User::class);
+    }
+
+    public function changedBy()
+    {
+        return $this->belongsTo(User::class, 'changed_by');
+    }
 }

@@ -9,13 +9,32 @@ class OrderItem extends Model
 {
     use HasFactory;
 
-    protected $fillable = ['order_id', 'product_id', 'qty', 'unit_price'];
-
-    protected $casts = [
-        'unit_price' => 'decimal:2',
-        'qty'        => 'integer',
+    protected $fillable = [
+        'order_id', 'product_id', 'quantity', 'price',
     ];
 
-    public function order() { return $this->belongsTo(Order::class); }
-    public function product() { return $this->belongsTo(Product::class); }
+    protected function casts(): array
+    {
+        return [
+            'quantity' => 'integer',
+            'price'    => 'decimal:2',
+        ];
+    }
+
+    /* ── Relationships ─────────────────────────────────────── */
+    public function order()
+    {
+        return $this->belongsTo(Order::class);
+    }
+
+    public function product()
+    {
+        return $this->belongsTo(Product::class);
+    }
+
+    /* ── Helpers ─────────────────────────────────────────────── */
+    public function subtotal(): float
+    {
+        return $this->quantity * $this->price;
+    }
 }

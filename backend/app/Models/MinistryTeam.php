@@ -2,15 +2,40 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class MinistryTeam extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
-    protected $fillable = ['name', 'description', 'icon', 'display_order'];
+    protected $fillable = [
+        'name', 'description', 'image', 'order', 'is_active',
+    ];
 
-    public function members() { return $this->hasMany(TeamMember::class, 'team_id'); }
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'order'     => 'integer',
+        ];
+    }
+
+    /* ── Relationships ─────────────────────────────────────── */
+    public function members()
+    {
+        return $this->hasMany(TeamMember::class)->orderBy('order');
+    }
+
+    public function activeMembers()
+    {
+        return $this->hasMany(TeamMember::class)->where('is_active', true)->orderBy('order');
+    }
+
+    /* ── Scopes ─────────────────────────────────────────────── */
+    public function scopeActive(Builder $q): Builder
+    {
+        return $q->where('is_active', true)->orderBy('order');
+    }
 }

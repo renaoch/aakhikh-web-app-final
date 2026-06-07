@@ -2,15 +2,29 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Leader extends Model
 {
-    use HasFactory, SoftDeletes;
+    use HasFactory;
 
     protected $fillable = [
-        'name', 'role', 'bio', 'photo_url', 'display_order', 'category',
+        'name', 'title', 'bio', 'avatar',
+        'email', 'phone', 'order', 'is_active',
     ];
+
+    protected function casts(): array
+    {
+        return [
+            'is_active' => 'boolean',
+            'order'     => 'integer',
+        ];
+    }
+
+    public function scopeActive(Builder $q): Builder
+    {
+        return $q->where('is_active', true)->orderBy('order');
+    }
 }
