@@ -27,12 +27,6 @@ use Illuminate\Support\Facades\Route;
 |--------------------------------------------------------------------------
 */
 
-// Auth
-Route::prefix('auth')->group(function () {
-    Route::post('login',    [AuthController::class, 'login']);
-    Route::post('register', [AuthController::class, 'register']);
-});
-
 // Public CMS reads
 Route::get('sermons',           [SermonController::class, 'index']);
 Route::get('sermons/{sermon}',  [SermonController::class, 'show']);
@@ -44,8 +38,8 @@ Route::get('daily-breads/{dailyBread}', [DailyBreadController::class, 'show']);
 Route::get('events',         [EventController::class, 'index']);
 Route::get('events/{event}', [EventController::class, 'show']);
 
-Route::get('announcements',               [AnnouncementController::class, 'index']);
-Route::get('announcements/{announcement}',[AnnouncementController::class, 'show']);
+Route::get('announcements',                [AnnouncementController::class, 'index']);
+Route::get('announcements/{announcement}', [AnnouncementController::class, 'show']);
 
 Route::get('testimonials', [TestimonialController::class, 'index']);
 
@@ -61,7 +55,7 @@ Route::get('products/{product}', [ProductController::class, 'show']);
 Route::get('service-schedules', [ServiceScheduleController::class, 'index']);
 Route::get('site-settings',     [SiteSettingController::class, 'index']);
 
-// Donations
+// Donations (guest)
 Route::post('donations/create-order', [DonationController::class, 'createOrder']);
 Route::post('donations/verify',       [DonationController::class, 'verify']);
 
@@ -80,13 +74,12 @@ Route::post('webhooks/ses',      [WebhookController::class, 'ses']);
 
 /*
 |--------------------------------------------------------------------------
-| Authenticated routes
+| Authenticated routes (Supabase JWT)
 |--------------------------------------------------------------------------
 */
-Route::middleware('auth:sanctum')->group(function () {
+Route::middleware('supabase.auth')->group(function () {
 
-    Route::post('auth/logout', [AuthController::class, 'logout']);
-    Route::get('auth/me',      [AuthController::class, 'me']);
+    Route::get('auth/me', [AuthController::class, 'me']);
 
     // Media
     Route::post('media/upload', [MediaController::class, 'upload']);
@@ -111,11 +104,11 @@ Route::middleware('auth:sanctum')->group(function () {
         Route::put('announcements/{announcement}',   [AnnouncementController::class, 'update']);
         Route::delete('announcements/{announcement}',[AnnouncementController::class, 'destroy']);
 
-        Route::get('testimonials/pending',               [TestimonialController::class, 'pending']);
-        Route::post('testimonials',                      [TestimonialController::class, 'store']);
-        Route::put('testimonials/{testimonial}',         [TestimonialController::class, 'update']);
+        Route::get('testimonials/pending',                [TestimonialController::class, 'pending']);
+        Route::post('testimonials',                       [TestimonialController::class, 'store']);
+        Route::put('testimonials/{testimonial}',          [TestimonialController::class, 'update']);
         Route::patch('testimonials/{testimonial}/approve',[TestimonialController::class, 'approve']);
-        Route::delete('testimonials/{testimonial}',      [TestimonialController::class, 'destroy']);
+        Route::delete('testimonials/{testimonial}',       [TestimonialController::class, 'destroy']);
 
         Route::post('leaders',            [LeaderController::class, 'store']);
         Route::put('leaders/{leader}',    [LeaderController::class, 'update']);
@@ -127,22 +120,22 @@ Route::middleware('auth:sanctum')->group(function () {
 
         Route::apiResource('ministry-teams.members', TeamMemberController::class);
 
-        Route::post('products',            [ProductController::class, 'store']);
-        Route::put('products/{product}',   [ProductController::class, 'update']);
-        Route::delete('products/{product}',[ProductController::class, 'destroy']);
+        Route::post('products',             [ProductController::class, 'store']);
+        Route::put('products/{product}',    [ProductController::class, 'update']);
+        Route::delete('products/{product}', [ProductController::class, 'destroy']);
 
         Route::get('orders',               [OrderController::class, 'index']);
         Route::get('donations',            [DonationController::class, 'index']);
         Route::get('donations/{donation}', [DonationController::class, 'show']);
 
-        Route::get('subscribers',                  [SubscriberController::class, 'index']);
-        Route::delete('subscribers/{subscriber}',  [SubscriberController::class, 'destroy']);
+        Route::get('subscribers',                 [SubscriberController::class, 'index']);
+        Route::delete('subscribers/{subscriber}', [SubscriberController::class, 'destroy']);
 
         Route::get('email-logs', [EmailLogController::class, 'index']);
 
-        Route::post('service-schedules',                    [ServiceScheduleController::class, 'store']);
-        Route::put('service-schedules/{serviceSchedule}',   [ServiceScheduleController::class, 'update']);
-        Route::delete('service-schedules/{serviceSchedule}',[ServiceScheduleController::class, 'destroy']);
+        Route::post('service-schedules',                     [ServiceScheduleController::class, 'store']);
+        Route::put('service-schedules/{serviceSchedule}',    [ServiceScheduleController::class, 'update']);
+        Route::delete('service-schedules/{serviceSchedule}', [ServiceScheduleController::class, 'destroy']);
 
         Route::put('site-settings', [SiteSettingController::class, 'update']);
     });

@@ -23,7 +23,7 @@ return [
     ],
 
     'ses' => [
-        'key' => env('AWS_ACCESS_KEY_ID'),
+        'key'    => env('AWS_ACCESS_KEY_ID'),
         'secret' => env('AWS_SECRET_ACCESS_KEY'),
         'region' => env('AWS_DEFAULT_REGION', 'us-east-1'),
     ],
@@ -31,19 +31,24 @@ return [
     'slack' => [
         'notifications' => [
             'bot_user_oauth_token' => env('SLACK_BOT_USER_OAUTH_TOKEN'),
-            'channel' => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
+            'channel'              => env('SLACK_BOT_USER_DEFAULT_CHANNEL'),
         ],
     ],
 
     'razorpay' => [
-    'key'            => env('RAZORPAY_KEY_ID'),
-    'secret'         => env('RAZORPAY_KEY_SECRET'),
-    'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
-],
+        'key'            => env('RAZORPAY_KEY_ID'),
+        'secret'         => env('RAZORPAY_KEY_SECRET'),
+        'webhook_secret' => env('RAZORPAY_WEBHOOK_SECRET'),
+    ],
 
-'youtube' => [
-    'api_key'    => env('YOUTUBE_API_KEY'),
-    'channel_id' => env('YOUTUBE_CHANNEL_ID'),
-],
+    'youtube' => [
+        'api_key'    => env('YOUTUBE_API_KEY'),
+        'channel_id' => env('YOUTUBE_CHANNEL_ID'),
+    ],
+
+    'supabase' => [
+        'url'         => env('SUPABASE_URL'),
+        'jwt_secret'  => env('SUPABASE_JWT_SECRET'),
+    ],
 
 ];

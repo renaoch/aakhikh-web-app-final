@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Middleware\EnsureUserHasRole;
+use App\Http\Middleware\SupabaseAuth;
 use Illuminate\Foundation\Application;
 use Illuminate\Foundation\Configuration\Exceptions;
 use Illuminate\Foundation\Configuration\Middleware;
@@ -14,10 +15,11 @@ return Application::configure(basePath: dirname(__DIR__))
     )
     ->withMiddleware(function (Middleware $middleware) {
         $middleware->alias([
-            'role' => EnsureUserHasRole::class,
+            'supabase.auth' => SupabaseAuth::class,
+            'role'          => EnsureUserHasRole::class,
         ]);
 
-        // Exclude webhook routes from CSRF / Sanctum cookie verification
+        // Exclude webhook routes from CSRF verification
         $middleware->validateCsrfTokens(except: [
             'api/webhooks/*',
         ]);
