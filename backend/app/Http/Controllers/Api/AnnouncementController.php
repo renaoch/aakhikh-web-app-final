@@ -15,14 +15,18 @@ class AnnouncementController extends Controller
         $query = Announcement::query();
 
         if (! $request->boolean('all')) {
-            $query->active();
+            $now = now();
+
+            $query->where('is_active', true)
+                ->where('published_at', '<=', $now)
+                ->where(function ($q) use ($now) {
+                    $q->whereNull('expires_at')
+                      ->orWhere('expires_at', '>=', $now);
+                });
         }
 
-        if ($request->filled('type')) {
-            $query->byType($request->type);
-        }
-
-        $announcements = $query->orderByDesc('priority')
+        $announcements = $query
+            ->orderByDesc('published_at')
             ->orderByDesc('created_at')
             ->paginate($request->integer('per_page', 15));
 

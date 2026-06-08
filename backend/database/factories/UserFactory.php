@@ -12,33 +12,29 @@ use Illuminate\Support\Str;
  */
 class UserFactory extends Factory
 {
-    /**
-     * Define the model's default state.
-     * No password — authentication is handled by Supabase.
-     *
-     * @return array<string, mixed>
-     */
     public function definition(): array
     {
         return [
-            'supabase_id'       => (string) Str::uuid(),
-            'name'              => fake()->name(),
-            'email'             => fake()->unique()->safeEmail(),
-            'phone'             => fake()->optional()->phoneNumber(),
-            'avatar'            => null,
-            'role'              => UserRole::Member,
-            'is_active'         => true,
-            'last_login_at'     => null,
+            'supabase_uid' => (string) Str::uuid(),
+            'name' => fake()->name(),
+            'email' => fake()->unique()->safeEmail(),
+            'phone' => fake()->optional()->phoneNumber(),
+            'avatar_url' => null,
+            'bio' => fake()->optional()->sentence(),
+'role' => UserRole::MEMBER,
+            'is_active' => true,
+            'last_login_at' => null,
+            'email_verified_at' => null,
         ];
     }
 
     public function admin(): static
     {
-        return $this->state(fn () => ['role' => UserRole::Admin]);
+        return $this->state(fn () => ['role' => UserRole::ADMIN]);
     }
 
     public function editor(): static
     {
-        return $this->state(fn () => ['role' => UserRole::Editor]);
+        return $this->state(fn () => ['role' => UserRole::WDITOR]);
     }
 }

@@ -11,34 +11,50 @@ class ServiceScheduleController extends Controller
 {
     public function index(): JsonResponse
     {
-        return response()->json(
-            ServiceSchedule::active()->get()
-        );
+        $schedules = ServiceSchedule::where('is_active', true)
+            ->orderBy('day_of_week')
+            ->orderBy('start_time')
+            ->get();
+
+        return response()->json($schedules);
+    }
+
+    public function show(ServiceSchedule $serviceSchedule): JsonResponse
+    {
+        return response()->json($serviceSchedule);
     }
 
     public function store(Request $request): JsonResponse
     {
         $data = $request->validate([
-            'name'        => 'required|string|max:255',
-            'day_of_week' => 'required|integer|between:0,6',
-            'time'        => 'required|date_format:H:i',
-            'location'    => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'is_active'   => 'boolean',
+            'title' => ['required', 'string', 'max:255'],
+            'description' => ['nullable', 'string'],
+            'day_of_week' => ['required', 'integer', 'between:0,6'],
+            'start_time' => ['required', 'date_format:H:i'],
+            'end_time' => ['nullable', 'date_format:H:i'],
+            'location' => ['nullable', 'string', 'max:255'],
+            'livestream_url' => ['nullable', 'url'],
+            'is_active' => ['sometimes', 'boolean'],
+            'format' => ['sometimes', 'string', 'in:in_person,online,hybrid'],
         ]);
 
-        return response()->json(ServiceSchedule::create($data), 201);
+        $schedule = ServiceSchedule::create($data);
+
+        return response()->json($schedule, 201);
     }
 
     public function update(Request $request, ServiceSchedule $serviceSchedule): JsonResponse
     {
         $data = $request->validate([
-            'name'        => 'sometimes|string|max:255',
-            'day_of_week' => 'sometimes|integer|between:0,6',
-            'time'        => 'sometimes|date_format:H:i',
-            'location'    => 'nullable|string|max:255',
-            'description' => 'nullable|string',
-            'is_active'   => 'boolean',
+            'title' => ['sometimes', 'string', 'max:255'],
+            'description' => ['sometimes', 'nullable', 'string'],
+            'day_of_week' => ['sometimes', 'integer', 'between:0,6'],
+            'start_time' => ['sometimes', 'date_format:H:i'],
+            'end_time' => ['sometimes', 'nullable', 'date_format:H:i'],
+            'location' => ['sometimes', 'nullable', 'string', 'max:255'],
+            'livestream_url' => ['sometimes', 'nullable', 'url'],
+            'is_active' => ['sometimes', 'boolean'],
+            'format' => ['sometimes', 'string', 'in:in_person,online,hybrid'],
         ]);
 
         $serviceSchedule->update($data);

@@ -6,40 +6,35 @@ use App\Http\Controllers\Controller;
 use App\Models\Leader;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\Rule;
 
 class LeaderController extends Controller
 {
-    /**
-     * List all leaders, ordered by display order.
-     */
     public function index(): JsonResponse
     {
-        $leaders = Leader::orderBy('order')->get();
+        $leaders = Leader::where('is_active', true)
+            ->orderBy('display_order')
+            ->get();
+
         return response()->json($leaders);
     }
 
-    /**
-     * Show a single leader.
-     */
     public function show(Leader $leader): JsonResponse
     {
         return response()->json($leader);
     }
 
-    /**
-     * Create a new leader.
-     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'name'        => 'required|string|max:255',
-            'title'       => 'required|string|max:255',
-            'bio'         => 'nullable|string',
-            'photo_url'   => 'nullable|url',
-            'email'       => 'nullable|email|max:255',
-            'phone'       => 'nullable|string|max:50',
-            'order'       => 'nullable|integer|min:0',
-            'is_active'   => 'boolean',
+            'name' => ['required', 'string', 'max:255'],
+            'role_title' => ['required', 'string', 'max:255'],
+            'bio' => ['nullable', 'string'],
+            'photo_url' => ['nullable', 'url'],
+            'email' => ['nullable', 'email', 'max:255'],
+            'display_order' => ['nullable', 'integer', 'min:0'],
+            'is_active' => ['sometimes', 'boolean'],
+            'category' => ['sometimes', 'string'],
         ]);
 
         $leader = Leader::create($validated);
@@ -47,20 +42,17 @@ class LeaderController extends Controller
         return response()->json($leader, 201);
     }
 
-    /**
-     * Update a leader.
-     */
     public function update(Request $request, Leader $leader): JsonResponse
     {
         $validated = $request->validate([
-            'name'        => 'sometimes|string|max:255',
-            'title'       => 'sometimes|string|max:255',
-            'bio'         => 'nullable|string',
-            'photo_url'   => 'nullable|url',
-            'email'       => 'nullable|email|max:255',
-            'phone'       => 'nullable|string|max:50',
-            'order'       => 'nullable|integer|min:0',
-            'is_active'   => 'boolean',
+            'name' => ['sometimes', 'string', 'max:255'],
+            'role_title' => ['sometimes', 'string', 'max:255'],
+            'bio' => ['sometimes', 'nullable', 'string'],
+            'photo_url' => ['sometimes', 'nullable', 'url'],
+            'email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'display_order' => ['sometimes', 'nullable', 'integer', 'min:0'],
+            'is_active' => ['sometimes', 'boolean'],
+            'category' => ['sometimes', 'string'],
         ]);
 
         $leader->update($validated);
@@ -68,12 +60,10 @@ class LeaderController extends Controller
         return response()->json($leader);
     }
 
-    /**
-     * Delete a leader.
-     */
     public function destroy(Leader $leader): JsonResponse
     {
         $leader->delete();
+
         return response()->json(['message' => 'Leader deleted successfully.']);
     }
 }

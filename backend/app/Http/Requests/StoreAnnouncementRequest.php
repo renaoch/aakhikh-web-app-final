@@ -13,13 +13,15 @@ class StoreAnnouncementRequest extends FormRequest
 
     public function rules(): array
     {
+        $isUpdate = in_array($this->method(), ['PUT', 'PATCH']);
+
         return [
-            'title'      => 'required|string|max:255',
-            'body'       => 'required|string',
-            'image_url'  => 'nullable|url|max:500',
-            'is_urgent'  => 'boolean',
-            'expires_at' => 'nullable|date|after:today',
-            'send_email' => 'boolean',
+            'title' => [$isUpdate ? 'sometimes' : 'required', 'string', 'max:255'],
+            'body' => [$isUpdate ? 'sometimes' : 'required', 'string'],
+            'is_active' => ['sometimes', 'boolean'],
+            'published_at' => [$isUpdate ? 'sometimes' : 'required', 'date'],
+            'expires_at' => ['sometimes', 'nullable', 'date', 'after:today'],
+            'created_by' => ['sometimes', 'nullable', 'exists:users,id'],
         ];
     }
 }

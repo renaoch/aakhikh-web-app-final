@@ -9,81 +9,73 @@ use Illuminate\Http\Request;
 
 class TestimonialController extends Controller
 {
-    /**
-     * List all approved testimonials (public).
-     */
     public function index(): JsonResponse
     {
-        $testimonials = Testimonial::where('is_approved', true)
+        $testimonials = Testimonial::where('status', 'approved')
             ->latest()
             ->get();
 
         return response()->json($testimonials);
     }
 
-    /**
-     * List ALL testimonials including pending (admin).
-     */
     public function pending(): JsonResponse
     {
-        $testimonials = Testimonial::where('is_approved', false)
+        $testimonials = Testimonial::where('status', 'pending')
             ->latest()
             ->get();
 
         return response()->json($testimonials);
     }
 
-    /**
-     * Show a single testimonial.
-     */
     public function show(Testimonial $testimonial): JsonResponse
     {
         return response()->json($testimonial);
     }
 
-    /**
-     * Submit a new testimonial (public — starts as unapproved).
-     */
     public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
-            'author_name'  => 'required|string|max:255',
-            'author_photo' => 'nullable|url',
-            'content'      => 'required|string|max:2000',
-            'role'         => 'nullable|string|max:100',
+            'author_name' => ['required', 'string', 'max:255'],
+            'author_email' => ['nullable', 'email', 'max:255'],
+            'content' => ['required', 'string', 'max:2000'],
+            'submitted_by' => ['nullable', 'uuid'],
         ]);
 
         $testimonial = Testimonial::create([
             ...$validated,
-            'is_approved' => false, // always starts pending
+            'status' => 'pending',
         ]);
 
         return response()->json([
             'message' => 'Testimonial submitted and pending review.',
-            'data'    => $testimonial,
+            'data' => $testimonial,
         ], 201);
     }
 
-    /**
-     * Approve a testimonial (admin).
-     */
     public function approve(Testimonial $testimonial): JsonResponse
     {
-        $testimonial->update(['is_approved' => true]);
-        return response()->json(['message' => 'Testimonial approved.', 'data' => $testimonial]);
+        $testimonial->update([
+            'status' => 'approved',
+            'reviewed_at' => now(),
+        ]);
+
+        return response()->json([
+            'message' => 'Testimonial approved.',
+            'data' => $testimonial->fresh(),
+        ]);
     }
 
-    /**
-     * Update a testimonial (admin).
-     */
     public function update(Request $request, Testimonial $testimonial): JsonResponse
     {
         $validated = $request->validate([
-            'author_name'  => 'sometimes|string|max:255',
-            'author_photo' => 'nullable|url',
-            'content'      => 'sometimes|string|max:2000',
-            'role'         => 'nullable|string|max:100',
-            'is_approved'  => 'boolean',
+            'author_name' => ['sometimes', 'string', 'max:255'],
+            'author_email' => ['sometimes', 'nullable', 'email', 'max:255'],
+            'content' => ['sometimes', 'string', 'max:2000'],
+            'submitted_by' => ['sometimes', 'nullable', 'uuid'],
+            'reviewed_by' => ['sometimes', 'nullable', 'uuid'],
+            'reviewed_at' => ['sometimes', 'nullable', 'date'],
+            'rejection_note' => ['sometimes', 'nullable', 'string'],
+            'status' => ['sometimes', 'string', 'in:pending,approved,rejected'],
         ]);
 
         $testimonial->update($validated);
@@ -91,12 +83,10 @@ class TestimonialController extends Controller
         return response()->json($testimonial);
     }
 
-    /**
-     * Delete a testimonial (admin).
-     */
     public function destroy(Testimonial $testimonial): JsonResponse
     {
         $testimonial->delete();
+
         return response()->json(['message' => 'Testimonial deleted successfully.']);
     }
 }
