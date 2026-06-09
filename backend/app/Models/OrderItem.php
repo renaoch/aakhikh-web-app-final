@@ -8,7 +8,8 @@ use Illuminate\Database\Eloquent\Model;
 class OrderItem extends Model
 {
     use HasFactory;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = [
         'order_id', 'product_id', 'quantity', 'price',
     ];

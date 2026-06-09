@@ -3,13 +3,15 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 
 class Sermon extends Model
 {
-    use HasFactory;
-
+    use HasFactory, HasUuids;
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = [
         'title', 'description', 'speaker', 'series',
         'preached_at', 'youtube_url', 'thumbnail',

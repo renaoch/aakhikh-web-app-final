@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\Model;
 class Order extends Model
 {
     use HasFactory;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = [
         'order_number', 'name', 'email', 'phone',
         'address', 'city', 'state', 'pincode',

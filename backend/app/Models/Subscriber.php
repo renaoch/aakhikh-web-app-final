@@ -9,7 +9,8 @@ use Illuminate\Database\Eloquent\Model;
 class Subscriber extends Model
 {
     use HasFactory;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = ['email', 'name', 'status', 'token'];
 
     protected function casts(): array

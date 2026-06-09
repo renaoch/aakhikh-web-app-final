@@ -9,8 +9,10 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 
 class DailyBread extends Model
 {
+    
     use HasFactory, SoftDeletes;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = [
         'title',
         'body',

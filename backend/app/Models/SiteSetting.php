@@ -9,7 +9,8 @@ use Illuminate\Support\Facades\Cache;
 class SiteSetting extends Model
 {
     use HasFactory;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = ['key', 'value', 'group'];
 
     /* ── Helpers ─────────────────────────────────────────────── */

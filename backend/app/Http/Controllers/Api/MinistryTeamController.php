@@ -14,7 +14,7 @@ class MinistryTeamController extends Controller
     public function index()
     {
         $teams = MinistryTeam::with(['members' => function ($q) {
-                $q->orderBy('order');
+             $q->orderBy('display_order');
             }])
             ->orderBy('name')
             ->get();
@@ -31,7 +31,7 @@ class MinistryTeamController extends Controller
     public function show(int $id)
     {
         $team = MinistryTeam::with(['members' => function ($q) {
-                $q->orderBy('order');
+          $q->orderBy('display_order');
             }])
             ->findOrFail($id);
 

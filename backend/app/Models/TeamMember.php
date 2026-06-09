@@ -3,35 +3,43 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class TeamMember extends Model
 {
-    use HasFactory;
+    use HasFactory, HasUuids, SoftDeletes;
+
+    public $incrementing = false;
+    protected $keyType = 'string';
 
     protected $fillable = [
-        'ministry_team_id', 'name', 'role',
-        'avatar', 'bio', 'order', 'is_active',
+        'team_id',
+        'name',
+        'role_title',
+        'photo_url',
+        'email',
+        'display_order',
+        'is_active',
     ];
 
     protected function casts(): array
     {
         return [
             'is_active' => 'boolean',
-            'order'     => 'integer',
+            'display_order' => 'integer',
         ];
     }
 
-    /* ── Relationships ─────────────────────────────────────── */
     public function team()
     {
-        return $this->belongsTo(MinistryTeam::class, 'ministry_team_id');
+        return $this->belongsTo(MinistryTeam::class, 'team_id');
     }
 
-    /* ── Scopes ─────────────────────────────────────────────── */
     public function scopeActive(Builder $q): Builder
     {
-        return $q->where('is_active', true)->orderBy('order');
+        return $q->where('is_active', true)->orderBy('display_order');
     }
 }

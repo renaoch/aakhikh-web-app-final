@@ -3,32 +3,30 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Database\Eloquent\Concerns\HasUuids;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
-use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Event extends Model
 {
-    use HasFactory, HasUuids, SoftDeletes;
-
-    public $incrementing = false;
-    protected $keyType = 'string';
+    use HasFactory;
 
     protected $fillable = [
-        'title', 'description', 'location', 'image_url',
-        'starts_at', 'ends_at', 'is_featured', 'is_active',
-        'registration_url', 'created_by',
+        'title', 'description', 'location', 'image',
+        'starts_at', 'ends_at', 'is_published', 'registration_url',
     ];
 
     protected function casts(): array
     {
         return [
-            'starts_at'   => 'datetime',
-            'ends_at'     => 'datetime',
-            'is_featured' => 'boolean',
-            'is_active'   => 'boolean',
+            'starts_at'    => 'datetime',
+            'ends_at'      => 'datetime',
+            'is_published' => 'boolean',
         ];
+    }
+
+    public function scopePublished(Builder $q): Builder
+    {
+        return $q->where('is_published', true);
     }
 
     public function scopeUpcoming(Builder $q): Builder

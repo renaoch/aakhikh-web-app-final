@@ -10,7 +10,8 @@ use Illuminate\Database\Eloquent\SoftDeletes;
 class Testimonial extends Model
 {
     use HasFactory, SoftDeletes;
-
+public $incrementing = false;
+protected $keyType = 'string';
     protected $fillable = [
         'author_name',
         'author_email',
